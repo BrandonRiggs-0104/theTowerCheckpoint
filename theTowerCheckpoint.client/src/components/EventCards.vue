@@ -1,25 +1,34 @@
 
 
 <template>
-  <div class="d-flex row col-9 justify-content-center m-3 bg-dark rounded text-center">
-    <div class="col-8 col-md-12 m-4">
-   <img class="img-fluid rounded" :src="eventProp.coverImg" :alt="eventProp.name">
-    <h3 class="m-3">{{ eventProp.name }}</h3>
-    <p>{{ eventProp.description }}</p>
+<router-link :to ="{ name: 'Events', params: {eventId: eventProp.id}}">
+  <div class="row justify-content-center m-3 bg-dark rounded text-center cards">
+    <div class="">
+   <img class="img-fluid" :src="eventProp.coverImg" :alt="eventProp.name">
+    <h3 >{{ eventProp.name }}</h3>
+    <p>{{ eventProp.location}}
+    {{ eventProp.startDate.toLocaleDateString() }}</p>
+    <!-- <p>{{ eventProp.description }}</p> -->
+    <!-- <p class="fs-5">Type of Event: {{ eventProp.type }}</p> -->
     <div>
-      <div>Tickets Total: </div>
-      <div>Tickets Remaining: </div>
+      <div>Total Capacity: {{ eventProp.capacity }}</div>
+      <!-- <div>Remaining Availability: {{  }}</div> -->
     </div>
    </div>
-   <button class="col-3 bg-success">RESERVE</button>
+   <!-- <button class="col-4 bg-success">Reserve</button>
+   <button class="col-4 bg-success">Comment</button> -->
   </div>
+</router-link>
 </template>
 
 
 <script>
+
+
 export default {
   props: {
-eventProp: {type: Object, required: true}
+eventProp: {type: Object, required: true},
+// ticketProp: {type: Object, required: true}
   },
   setup(){
     return {}
@@ -29,5 +38,7 @@ eventProp: {type: Object, required: true}
 
 
 <style lang="scss" scoped>
-
+.cards{
+height: 100%;
+}
 </style>

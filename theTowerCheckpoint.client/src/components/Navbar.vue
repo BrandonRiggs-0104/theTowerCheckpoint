@@ -12,9 +12,10 @@
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto">
         <li>
-          <router-link :to="{ name: 'About' }" class="btn text-success lighten-30 selectable text-uppercase">
-            About
+          <router-link :to="{ name: 'Profile' }" class="btn text-success lighten-30 selectable">
+            Attending / Created Events
           </router-link>
+          <button class="bg-dark m-3 mdi mdi-plus btn btn-outline" @click="">Create an Event</button>
         </li>
       </ul>
       <!-- LOGIN COMPONENT HERE -->
