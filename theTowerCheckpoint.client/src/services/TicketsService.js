@@ -1,4 +1,5 @@
 import { AppState } from "../AppState"
+import { logger } from "../utils/Logger.js"
 import { api } from "./AxiosService"
 
 
@@ -14,6 +15,7 @@ class TicketsService {
   async sellTicket(ticketId) {
     const res = await api.delete('api/tickets/' + ticketId)
     AppState.ticketProfiles = AppState.ticketProfiles.filter(t => t.id != ticketId)
+    logger.log('the tickets in the appstate', AppState.ticketProfiles)
   }
   async getTicketsByAccount() {
     const res = await api.get('account/tickets')
