@@ -28,7 +28,8 @@ export default {
   --main-height: calc(100vh - 32px - 64px);
 }
 
+
 main {
-  background-color: black;
+  background-color: rgba(12, 148, 153, 0.719);
 }
 </style>

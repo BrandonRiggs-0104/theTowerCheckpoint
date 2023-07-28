@@ -1,8 +1,0 @@
-
-
-
-class TicketService {
-  async getTickets() {
-
-  }
-}

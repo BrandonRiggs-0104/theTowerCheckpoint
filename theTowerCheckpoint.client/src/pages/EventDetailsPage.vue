@@ -1,76 +1,75 @@
 <template>
-  <div class="container-fluid bg-dark">
-    <div class="row justify-content-center">
-      <div v-if="event" class="d-flex col-12 m-3 justify-content-center">
-        <div class="">
-          <img :src="event.coverImg" :alt="event.name" class="cover-img rounded m-3">
-        </div>
-        <div class="text-center">
-          <h2>{{ event.name }}</h2>
-          <p class="fs-4">{{ event.location }}
-            {{ event.startDate.toLocaleString() }}
-          </p>
-          <p>
-            {{ event.description }}
-          </p>
-          <div>Total Capacity: {{ event.capacity }}</div>
-          <div>Remaining Tickets: {{ }}</div>
-          <div>
-            <button class="col-3 bg-success m-3">Reserve</button>
-            <button class="col-3 bg-success m-3">Comment</button>
-          </div>
-        </div>
+  <div class="container-fluid">
+    <section class="row">
+      <div class="col-12">
+        <h1 class="text-center">{{ event.name }}</h1>
       </div>
-    </div>
-    <div class="container-fluid bg-primary my-3">
-      <h4>Comments:</h4>
-      <div>something</div>
-      <div>something</div>
-      <div>something</div>
-      <div>something</div>
-    </div>
+      <div class="col-12 col-md-6">
+        <EventDetailsCard />
+      </div>
+      <div class="col-12 col-md-6">
+        <Comments :comment="c" />
+      </div>
+      <div class="col-8 my-2">
+        <TicketHolders :ticketProfiles="t" />
+      </div>
+    </section>
   </div>
 </template>
 
-
 <script>
-import { useRoute } from "vue-router";
-import Pop from "../utils/Pop.js";
-import { eventsService } from "../services/EventsService.js";
-import { computed, onMounted } from "vue";
-import { AppState } from "../AppState.js";
-
+import { eventsService } from '../services/EventsService'
+import { commentsService } from '../services/CommentsService'
+import { ticketsService } from '../services/TicketsService'
+// import { logger } from '../utils/Logger'
+import Pop from '../utils/Pop';
+import { computed, onMounted, ref } from 'vue'
+import { AppState } from '../AppState'
+import { useRoute } from 'vue-router'
+import EventDetailsCard from '../components/EventDetailsCard.vue';
+import Comments from '../components/Comments.vue'
+import TicketHolders from '../components/TicketHolders.vue'
 export default {
   setup() {
+    const editable = ref({})
     const route = useRoute()
-
     async function getEventById() {
       try {
-        const eventId = route.params.eventId
-        await eventsService.getEventById(eventId)
-
-      } catch (error) {
-        Pop.error(error.message)
+        await eventsService.getById(route.params.eventId);
+      }
+      catch (error) {
+        Pop.error(error)
       }
     }
-
+    async function getCommentsByEventId() {
+      try {
+        await commentsService.getCommentsByEventId(route.params.eventId)
+      }
+      catch (error) {
+        Pop.error(error)
+      }
+    }
+    async function getTicketProfiles() {
+      try {
+        await ticketsService.getTicketProfiles(route.params.eventId)
+      }
+      catch (error) {
+        Pop.error(error)
+      }
+    }
     onMounted(() => {
       getEventById()
+      getCommentsByEventId()
+      getTicketProfiles()
     })
     return {
-      event: computed(() => AppState.activeEvent)
+      editable,
+      event: computed(() => AppState.activeEvent),
+      comments: computed(() => AppState.comments),
     }
-  }
+  },
+  components: { EventDetailsCard, Comments, TicketHolders }
 }
 </script>
 
-
-<style lang="scss" scoped>
-.cover-img {
-  width: 100vh;
-}
-
-template {
-  background-color: black;
-}
-</style>
+<style scoped></style>

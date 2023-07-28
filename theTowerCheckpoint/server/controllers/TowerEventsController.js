@@ -1,76 +1,96 @@
 import { Auth0Provider } from "@bcwdev/auth0provider";
-import BaseController from "../utils/BaseController.js";
-import { towerEventsService } from "../services/TowerEventService.js";
-
+import { towerEventsService } from "../services/TowerEventsService.js";
+import BaseController from "../utils/BaseController.js"
+import { ticketsService } from "../services/TicketsService.js";
+import { dbContext } from "../db/DbContext.js";
+import { commentsService } from "../services/CommentsService.js";
 
 
 export class TowerEventsController extends BaseController {
   constructor() {
     super('api/events')
     this.router
-      .get('', this.getTowerEvents)
-      .get('/:towerEventById', this.getTowerEventsById)
+      .get('', this.findAllEvents)
+      .get('/:id', this.FindEventsById)
+      // .get('', this.getAllComments)
+      .get('/:eventId/comments', this.getCommentsByEventId)
+      .get('/:eventId/tickets', this.getTicketsByAccountId)
       .use(Auth0Provider.getAuthorizedUserInfo)
-      .post('', this.createTowerEvents)
-      .put('/:eventId', this.editTowerEvent)
-      .delete('/:eventId', this.removeTowerEvent)
+      .delete('/:eventId', this.archiveTowerEvent)
+      .post('', this.create)
+      .put('/:eventId', this.editEvent)
+
   }
-
-  async createTowerEvents(req, res, next) {
+  async editEvent(req, res, next) {
     try {
-      const towerEventData = req.body
-      towerEventData.creatorId = req.userInfo.id
-      const towerEvent = await towerEventsService.createTowerEvents(towerEventData)
-
-      return res.send(towerEvent)
+      const towerEventsData = req.body
+      const towerEventsId = req.params.eventId
+      const userId = req.userInfo.id
+      const editedEvent = await towerEventsService.editEvent(towerEventsData, towerEventsId, userId)
+      return res.send(editedEvent)
     } catch (error) {
       next(error)
     }
   }
-
-  async getTowerEvents(req, res, next) {
+  async getMyTickets(req, res, next) {
     try {
-      const towerEvents = await towerEventsService.getTowerEvents()
-
+      const tickets = await ticketsService.getMyTickets(req.params.eventId)
+      return res.send(tickets)
+    } catch (error) {
+      next(error)
+    }
+  }
+  async FindEventsById(req, res, next) {
+    try {
+      const towerEvents = await towerEventsService.findEventsById(req.params.id)
+      return res.send(towerEvents)
+    } catch (error) {
+      next(error)
+    }
+  }
+  async findAllEvents(req, res, next) {
+    try {
+      const towerEvents = await towerEventsService.findAllTowerEvents()
       return res.send(towerEvents)
     } catch (error) {
       next(error)
     }
   }
 
-  async getTowerEventsById(req, res, next) {
+  async getTicketsByAccountId(req, res, next) {
     try {
-      const towerEventById = req.params.towerEventById
-      const towerEvent = await towerEventsService.getTowerEventsById(towerEventById)
-      return res.send(towerEvent)
-
+      const eventId = req.params.eventId
+      const tickets = await ticketsService.getTicketsByAccountId(eventId)
+      return res.send(tickets)
     } catch (error) {
       next(error)
     }
   }
 
-  async editTowerEvent(req, res, next) {
+  async archiveTowerEvent(req, res, next) {
     try {
-      const eventId = req.params.eventId
-      const userId = req.userInfo.id
-      const towerEventData = req.body
-      const editedTowerEvent = await towerEventsService.editTowerEvent(eventId, userId, towerEventData)
-      res.send(editedTowerEvent)
-
+      const towerEvents = await towerEventsService.archiveTowerEvent(req.params.eventId, req.userInfo.id)
+      return res.send(towerEvents)
     } catch (error) {
       next(error)
     }
   }
-  async removeTowerEvent(req, res, next) {
+  async create(req, res, next) {
     try {
-      const eventId = req.params.eventId
-      const userId = req.userInfo.id
-      await towerEventsService.removeTowerEvent(eventId, userId)
-
-
+      req.body.creatorId = req.userInfo.id
+      const towerEvents = await towerEventsService.create(req.body)
+      return res.send(towerEvents)
     } catch (error) {
       next(error)
     }
-    res.send('Event was deleted.')
+  }
+
+  async getCommentsByEventId(req, res, next) {
+    try {
+      const comments = await commentsService.getAllComments({ eventId: req.params.eventId })
+      return res.send(comments)
+    } catch (error) {
+      next(error)
+    }
   }
 }

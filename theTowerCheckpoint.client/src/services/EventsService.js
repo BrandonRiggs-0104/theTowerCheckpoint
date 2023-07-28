@@ -1,28 +1,28 @@
-import { AppState } from "../AppState.js"
-import { Event } from "../models/Event.js"
-import { logger } from "../utils/Logger.js"
-import { api } from "./AxiosService.js"
+import { AppState } from "../AppState"
+import { logger } from "../utils/Logger"
+import { api } from "./AxiosService"
 
-class EventsService {
-  async getEvents() {
+
+class EventsService{
+  async getAll(){
     const res = await api.get('api/events')
-    logger.log('getting events', res.data)
-    const events = res.data.map(eventPojo => new Event(eventPojo))
-    AppState.events = events
+    AppState.events = res.data
   }
 
-  async getEventById(eventId) {
-    const res = await api.get(`api/events/${eventId}`)
-    logger.log('got event by Id', res.data)
-    const event = new Event(res.data)
-    AppState.activeEvent = event
+  async getById(id){
+    const res = await api.get('api/events/'+id)
+    AppState.activeEvent = res.data
   }
 
-  async createEvent(eventData) {
-    const res = await api.post('api/events', eventData)
-    logger.log(res.data)
-    const event = new Event(res.data)
-    return event
+  async createEvent(newEvent){
+    const res = await api.post('api/events', newEvent)
+    AppState.events.unshift(res.data)
+    return res.data
+  }
+  async cancelEvent(eventId){
+    const res = await api.delete('api/events/'+eventId)
+    return res.data
   }
 }
+
 export const eventsService = new EventsService()
